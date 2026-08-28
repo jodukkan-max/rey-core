@@ -1,0 +1,34 @@
+/*
+ * Nested Carousel — frontend + editor styles.
+ *
+ * Slides-per-view and gap are reflected with a PURE-CSS formula (identical to
+ * Rey's `carousel` widget), so the editor shows the correct number of slides
+ * with zero JS. The `--per-row` / `--gap` variables are emitted by the controls
+ * via Elementor `selectors`; the values below are the fallback defaults.
+ */
+
+.elementor-widget-reycore-nested-carousel .rey-nested-carousel {
+	--per-row: 1;
+	--gap: 15px;
+	position: relative;
+}
+
+.elementor-widget-reycore-nested-carousel .rey-nested-carousel .splide__track {
+	overflow: hidden;
+}
+
+.elementor-widget-reycore-nested-carousel .rey-nested-carousel .splide__list {
+	display: flex;
+	min-height: 100px;
+}
+
+.elementor-widget-reycore-nested-carousel .rey-nested-carousel .splide__slide {
+	flex-shrink: 0;
+	width: calc( ( 100% - var( --gap ) * ( var( --per-row ) - 1 ) ) / var( --per-row ) );
+	margin-right: var( --gap );
+}
+
+/* Make the free-form container fill its slide. */
+.elementor-widget-reycore-nested-carousel .rey-nested-carousel .splide__slide > .e-con {
+	width: 100%;
+}
