@@ -82,6 +82,7 @@ class Plugin
 		new Admin();
 		new AdminBanners();
 		new WhatsNew();
+		new GithubUpdater();
 		new Styles();
 		new Mobile();
 		new Helper();
