@@ -3,9 +3,9 @@
  * Plugin Name: Rey Core
  * Description: Core plugin for Rey.
  * Plugin URI: http://www.reytheme.com/
- * Version: 3.1.12
- * Author: ReyTheme
- * Author URI:  https://x.com/mariushoria
+ * Version: 3.1.13
+ * Author: Dukkan
+ * Author URI:  https://github.com/jodukkan-max/rey-core
  * Text Domain: rey-core
  */
 
@@ -47,7 +47,7 @@ class ReyCore
 	{
 		$this->define( 'REY_CORE_DIR', plugin_dir_path( __FILE__ ) );
 		$this->define( 'REY_CORE_URI', plugin_dir_url( __FILE__ ) );
-		$this->define( 'REY_CORE_VERSION', '3.1.12' );
+		$this->define( 'REY_CORE_VERSION', '3.1.13' );
 		$this->define( 'REY_CORE_PLACEHOLDER', REY_CORE_URI . 'assets/images/placeholder.png' );
 		$this->define( 'REY_CORE_REQUIRED_PHP_VERSION', '5.4.0' );
 		$this->define( 'REY_CORE_DB_VERSION', '127538' );
