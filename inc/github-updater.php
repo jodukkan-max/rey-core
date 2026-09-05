@@ -40,20 +40,46 @@ class GithubUpdater {
 
 	/**
 	 * Register the update hooks.
+	 *
+	 * Hooks both the "set" and "read" update filters at the highest possible
+	 * priority so this runs last and overrides any `rey-core` update entry
+	 * injected by the Rey theme's own updater. This makes GitHub the single
+	 * source of truth for Rey Core updates.
 	 */
 	public function __construct() {
-		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_for_update' ], 20 );
-		add_filter( 'plugins_api', [ $this, 'plugin_info' ], 20, 3 );
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_for_update' ], PHP_INT_MAX );
+		add_filter( 'site_transient_update_plugins', [ $this, 'check_for_update' ], PHP_INT_MAX );
+		add_filter( 'plugins_api', [ $this, 'plugin_info' ], PHP_INT_MAX, 3 );
 	}
 
 	/**
 	 * Inject a pending update when GitHub has a newer release.
+	 *
+	 * Also drops any pre-existing entry for this plugin (e.g. one injected by
+	 * the Rey theme) so that only GitHub can offer a Rey Core update.
 	 *
 	 * @param object $transient The update_plugins transient.
 	 * @return object
 	 */
 	public function check_for_update( $transient ) {
 
+		if ( ! is_object( $transient ) ) {
+			return $transient;
+		}
+
+		if ( ! isset( $transient->response ) || ! is_array( $transient->response ) ) {
+			$transient->response = [];
+		}
+
+		// Always remove any pre-existing Rey Core entry (from Rey's updater)
+		// before deciding whether to add our GitHub entry.
+		unset( $transient->response[ self::BASENAME ] );
+
+		if ( isset( $transient->no_update ) && is_array( $transient->no_update ) ) {
+			unset( $transient->no_update[ self::BASENAME ] );
+		}
+
+		// Don't offer an update before the installed version is known.
 		if ( empty( $transient->checked ) ) {
 			return $transient;
 		}
