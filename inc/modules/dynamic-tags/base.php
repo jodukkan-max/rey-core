@@ -32,56 +32,11 @@ class Base extends \ReyCore\Modules\ModuleBase {
 	{
 		$this->manager = $manager;
 
-		$defaults = [
-			self::GROUPS_POST => [
-				'title' => esc_html__( 'Post', 'rey-core' ),
-				'tags' => [
-					'Post\Title',
-					'Post\Content',
-					'Post\Excerpt',
-					'Post\Author',
-					'Post\AuthorLink',
-					'Post\AuthorImage',
-					'Post\Image',
-					'Post\ImageData',
-					'Post\Url',
-					'Post\PageUrl',
-					'Post\Terms',
-					'Post\Date',
-					'Post\HumanDate',
-					'Post\Duration',
-					'Post\Meta',
-					'Post\ImageMeta',
-					'Post\CommentsCount',
-				],
-			],
-			self::GROUPS_ARCHIVE => [
-				'title' => esc_html__( 'Archive', 'rey-core' ),
-				'tags' => [
-					'Archive\Title',
-					'Archive\Desc',
-					'Archive\URL',
-					'Archive\Meta',
-					'Archive\ProductCategoryImage',
-				],
-			],
-			self::GROUPS_SITE => [
-				'title' => esc_html__( 'Site', 'rey-core' ),
-				'tags' => [
-					'Site\Title',
-					'Site\Url',
-					'Site\Email',
-					'Site\Logo',
-					'Site\User',
-					'Site\UserImage',
-					'Site\Param',
-				],
-			],
-		];
+		$defaults = [];
 
 		if( class_exists('\WooCommerce') ){
 			$defaults[self::GROUPS_WOO] = [
-				'title' => esc_html__( 'WooCommerce', 'rey-core' ),
+				'title' => esc_html__( 'Ecommerce', 'rey-core' ),
 				'tags' => [
 					'Woo\Title',
 					'Woo\Url',
@@ -89,7 +44,6 @@ class Base extends \ReyCore\Modules\ModuleBase {
 					'Woo\ShortDescription',
 					'Woo\Price',
 					'Woo\Sku',
-					'Woo\AddToCartUrl',
 					'Woo\Image',
 					'Woo\Gallery',
 					'Woo\Stock',
@@ -99,39 +53,50 @@ class Base extends \ReyCore\Modules\ModuleBase {
 					'Woo\TagUrl',
 					'Woo\Tags',
 					'Woo\Attributes',
-					'Woo\AttributeTerm',
 					'Woo\AttributeImage',
 					'Woo\AttributeGallery',
 					'Woo\Rating',
 					'Woo\Information',
 					'Woo\Weight',
 					'Woo\Dimensions',
-					'Woo\Meta',
 				],
 			];
 		}
 
-		if( class_exists('\ACF') ){
-			$defaults[self::GROUPS_ACF] = [
-				'title' => esc_html__( 'Advanced Custom Fields', 'rey-core' ),
+		$defaults = array_merge( $defaults, [
+			self::GROUPS_POST => [
+				'title' => esc_html__( 'Post', 'rey-core' ),
 				'tags' => [
-					'Acf\Text',
-					'Acf\Link',
-					'Acf\Image',
-					'Acf\Color',
-					'Acf\Gallery',
-					'Acf\RepeaterText',
-					'Acf\RepeaterLink',
-					'Acf\RepeaterImage',
-					'Acf\RepeaterGallery',
+					'Post\Title',
+					'Post\Content',
+					'Post\Excerpt',
+					'Post\Author',
+					'Post\AuthorImage',
+					'Post\Image',
+					'Post\PageUrl',
+					'Post\Terms',
+					'Post\Date',
+					'Post\HumanDate',
+					'Post\Duration',
+					'Post\ImageMeta',
+					'Post\CommentsCount',
 				],
-			];
-		}
+			],
+			self::GROUPS_SITE => [
+				'title' => esc_html__( 'Site', 'rey-core' ),
+				'tags' => [
+					'Site\Title',
+					'Site\Url',
+					'Site\Logo',
+					'Site\UserImage',
+				],
+			],
+		] );
 
 		foreach ($defaults as $id => $group) {
 
 			$manager->register_group( $id, [
-				'title' => $group['title'] . ' (rey)',
+				'title' => $group['title'] . ( self::GROUPS_WOO === $id ? '' : ' (rey)' ),
 			] );
 
 			foreach ($group['tags'] as $tag) {
