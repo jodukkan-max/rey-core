@@ -10,7 +10,7 @@ class Url extends \ReyCore\Modules\DynamicTags\Tags\Tag {
 	public static function __config() {
 		return [
 			'id'         => 'product-url',
-			'title'      => esc_html__( 'Product URL', 'rey-core' ),
+			'title'      => esc_html__( 'Product', 'rey-core' ),
 			'categories' => [ 'url' ],
 			'group'      => TagDynamic::GROUPS_WOO,
 		];

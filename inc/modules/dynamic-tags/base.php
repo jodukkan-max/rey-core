@@ -53,6 +53,7 @@ class Base extends \ReyCore\Modules\ModuleBase {
 					'Woo\TagUrl',
 					'Woo\Tags',
 					'Woo\Attributes',
+					'Woo\Brand',
 					'Woo\AttributeImage',
 					'Woo\AttributeGallery',
 					'Woo\Rating',
