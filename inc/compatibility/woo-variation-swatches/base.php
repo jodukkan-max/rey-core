@@ -61,7 +61,6 @@ class Base extends \ReyCore\Compatibility\CompatibilityBase
 		add_action( 'create_term', [$this, 'clear_term_transient'], 10, 3 );
 		add_action( 'edit_term', [$this, 'clear_term_transient'], 10, 3 );
 		add_action( 'delete_term', [$this, 'clear_term_transient'], 10, 3 );
-		add_action( 'reycore/demo_import/attributes', [$this, 'demo_import_clear_caches'] );
 	}
 
 	function customizer__add_notice($control_args, $section){
@@ -1179,11 +1178,5 @@ class Base extends \ReyCore\Compatibility\CompatibilityBase
 			endforeach;
 		endif;
 	}
-
-	function demo_import_clear_caches(){
-		delete_transient( 'wc_attribute_taxonomies' );
-		delete_transient( sprintf( self::TRANSIENT_ACTIVE_ATTR_DATA_WVS, wc_attribute_taxonomy_name($this->get_selected_attribute_taxonomy()) ) );
-	}
-
 
 }

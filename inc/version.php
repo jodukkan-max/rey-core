@@ -171,12 +171,6 @@ class Version {
 				continue;
 			}
 
-			if( function_exists('rey__valid_url') ){
-				if( ! rey__valid_url( \ReyTheme_API::getInstance()->get_test_url() ) ){
-					continue;
-				}
-			}
-
 			// Convert to valid version number
 			$callback_version = (string) str_replace( '_', '.', $matches[1] );
 

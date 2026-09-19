@@ -22,7 +22,6 @@ class Base
 			return;
 		}
 
-		new TemplateLibrary\Base();
 		new Editor();
 		new WidgetsOverrides();
 

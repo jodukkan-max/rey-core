@@ -189,23 +189,6 @@ class WhatsNew {
 		];
 
 		$items[] = [
-			'label'    => 'Design & Utility',
-			'title'    => 'Santiago Demo',
-			'desc'     => '<p>Make use of a pastel design with clean and fancy approaches, for various uses.</p>
-			<p>You can import the demo in the Import Demo section under Rey Dashboard, or <a href="https://demos.reytheme.com/santiago/" target="_blank">preview the Santiago demo</a>.</p>',
-			'img'      => REY_CORE_URI . '/assets/images/whats-new/santiago-demo.jpg',
-		];
-
-		$items[] = [
-			'reversed' => true,
-			'label'    => 'Design & Utility',
-			'title'    => 'San Francisco Demo',
-			'desc'     => '<p>A super stylish demo for all sorts of purposes with a clean finish and gorgeous details.</p>
-			<p>You can import the demo in the Import Demo section under Rey Dashboard, or <a href="https://demos.reytheme.com/san-francisco/" target="_blank">preview the San Francisco demo</a>.</p>',
-			'img'      => REY_CORE_URI . '/assets/images/whats-new/sanfran-demo.jpg',
-		];
-
-		$items[] = [
 			'size'  => 'third',
 			'label' => 'Performance',
 			'title' => 'Code Refactoring',

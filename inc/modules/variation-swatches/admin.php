@@ -26,8 +26,6 @@ class Admin
 		add_action( 'create_term', [$this, 'clear_attribute_term_transient'], 10, 3 );
 		add_action( 'edit_term', [$this, 'clear_attribute_term_transient'], 10, 3 );
 		add_action( 'delete_term', [$this, 'clear_attribute_term_transient'], 10, 3 );
-		add_action( 'reycore/demo_import/attributes', [$this, 'demo_import'] );
-		add_action( 'reycore/import/config', [$this, 'demo_import'] );
 		add_filter( 'rey/export/config', [$this, 'export_swatches_options']);
 
 		$this->add_term_controls();
@@ -565,20 +563,6 @@ class Admin
 		}
 
 		return $output;
-	}
-
-	public function demo_import( $config ){
-
-		if( isset($config['config'][ Base::OPT ]) && ($swatches_config = $config['config'][ Base::OPT ])){
-			update_option(Base::OPT, $swatches_config, false);
-		}
-
-		$this->demo_import_clear_caches();
-	}
-
-	function demo_import_clear_caches(){
-		delete_transient( 'wc_attribute_taxonomies' );
-		\WC_Cache_Helper::invalidate_cache_group( 'woocommerce-attributes' );
 	}
 
 	/**

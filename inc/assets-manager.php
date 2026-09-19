@@ -1055,7 +1055,6 @@ final class AssetsManager
 			// Rey Script already loaded in bundle
 			if( 'rey-script' === $handle
 				&& ! is_admin()
-				&& current_user_can('administrator')
 				&& ! is_customize_preview()
 				&& ! $this->is_edit_mode()
 			){

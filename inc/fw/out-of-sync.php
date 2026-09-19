@@ -33,9 +33,6 @@ class OutOfSync
 
 		add_action( 'admin_notices', [$this, 'render_notice'] );
 		add_action( 'wp_body_open', [$this, 'render_notice'] );
-		add_action( 'wp_ajax_rey_outdated_link', [$this, 'ajax__outdated_link'] );
-		add_action( 'wp_ajax_rey_download_link', [$this, 'ajax__download_link'] );
-		add_action( 'wp_ajax_rey_get_actions', [$this, 'ajax__get_actions'] );
 	}
 
 	/**
@@ -147,7 +144,7 @@ class OutOfSync
 
 		$items = self::get_items();
 
-		$maybe_load_assets = [];
+		$notice_rendered = false;
 
 		foreach ( array_keys($items) as $slug ) {
 
@@ -156,8 +153,6 @@ class OutOfSync
 			if( empty($config) ){
 				continue;
 			}
-
-			$maybe_load_assets[] = true;
 
 			$sync_error = sprintf(
 				__('<p><strong>%s</strong> is outdated and not in sync with <strong>%s</strong>.</p>', 'rey-core'),
@@ -173,154 +168,17 @@ class OutOfSync
 				function_exists('rey__support_url') ? rey__support_url('kb/rey-theme-is-outdated-and-not-in-sync-with-rey-core-error/') : ''
 			);
 
-			$nonce = wp_create_nonce( 'updates' );
-
-			$sync_error .= sprintf('<p id="outofsync-error-actions" style="display:none" data-slug="%s" data-nonce="%s"><span class="spinner"></span>', $config['slug'], $nonce);
-
-			$sync_error .= sprintf(
-				__('<strong><u><a href="#" data-slug="%2$s" data-nonce="%3$s" class="rey-genericBtn" id="js-update-link">Update %1$s now</a></u></strong>', 'rey-core'),
-				$config['to_update'],
-				$config['slug'],
-				$nonce
-			);
-
-			$sync_error .= '&nbsp; or &nbsp;';
-
-			$sync_error .= sprintf(
-				__('<strong><u><a href="#" data-slug="%1$s" data-nonce="%2$s" class="rey-genericBtn" id="js-update-download-link">download</a></u></strong> and manually install it like you would install a new %3$s.', 'rey-core'),
-				$config['slug'],
-				$nonce,
-				$config['type']
-			);
-
-			$sync_error .= '</p>';
-
-			$sync_error .= '<p id="outofsync-error-spinner"></p>';
-
 			$sync_error .= __('<p><small>This message only shows to administrators and is not public.</small></p>', 'rey-core');
 
 			printf('<div class="rey-overlay --no-close" id="outofsync-error--overlay"></div><div id="outofsync-error">%s</div>', $sync_error);
+
+			$notice_rendered = true;
 		}
 
-		if( in_array(true, $maybe_load_assets, true) ){
-			$this->print_js();
+		if( $notice_rendered ){
 			$this->print_css();
 		}
 
-	}
-
-	public static function ajax_get_data(){
-
-		if ( ! wp_verify_nonce( $_POST['_ajax_nonce'], 'updates' ) ) {
-			return ['error' => 'Operation not allowed!'];
-		}
-
-		if( ! (current_user_can('administrator') || current_user_can('install_plugins')) ){
-			return ['error' => 'Operation not allowed!'];
-		}
-
-		if( ! function_exists('rey__clean') ){
-			return ['error' => 'Missing clean function.'];
-		}
-
-		if( ! (isset($_POST['slug']) && $slug = rey__clean($_POST['slug'])) ){
-			return ['error' => 'Missing type.'];
-		}
-
-		$items = self::get_items();
-
-		if( ! isset($items[$slug]) ){
-			return ['error' => 'Incorrect slug.'];
-		}
-
-		return [
-			'slug' => $slug,
-			'items' => $items,
-		];
-	}
-
-	public function ajax__outdated_link(){
-
-		$data = self::ajax_get_data();
-
-		if( isset($data['error']) ){
-			wp_send_json_error( $data['error'] );
-		}
-
-		if( ! class_exists('\Rey\Upgrader') ){
-			require_once __DIR__ . '/upgrader.php';
-		}
-
-		$upgrader = new \Rey\Upgrader([
-			'slug'     => $data['slug'],
-			'basename' => $data['items'][ $data['slug'] ]['basename'],
-			'hook'     => 'rey/update/outofsync',
-		]);
-
-		if( ! empty($upgrader->error) ){
-			wp_send_json_error( $upgrader->error );
-		}
-
-		wp_send_json_success( $upgrader );
-	}
-
-
-	/**
-	 * Handles downloading the lastest version
-	 *
-	 * @return void
-	 */
-	public function ajax__download_link(){
-
-		$data = self::ajax_get_data();
-
-		if( isset($data['error']) ){
-			wp_send_json_error( $data['error'] );
-		}
-
-		if( ! ($download_link = self::get_download_url( $data['slug'] ) ) ){
-			wp_send_json_error( 'Cannot retrieve download link.' );
-		}
-
-		wp_send_json_success($download_link);
-	}
-
-	public static function get_download_url( $slug ){
-
-		if( ! class_exists('\ReyTheme_API') ){
-			return false;
-		}
-
-		return \ReyTheme_API::getInstance()->get_download_url( self::THEME_SLUG === $slug ? 'theme' : $slug );
-	}
-
-	/**
-	 * Handles downloading the lastest version
-	 *
-	 * @return void
-	 */
-	public function ajax__get_actions(){
-
-		$data = self::ajax_get_data();
-
-		if( isset($data['error']) ){
-			wp_send_json_error( $data['error'] );
-		}
-
-		if( ! class_exists('\ReyTheme_API') ){
-			wp_send_json_error();
-		}
-
-		$url = add_query_arg([
-			'purchase_code' => \ReyTheme_Base::get_purchase_code()
-			], \ReyTheme_API::$api_site_url
-		);
-
-		if( ! self::valid_url( $url ) ){
-			wp_send_json_error();
-		}
-
-		wp_send_json_success();
 	}
 
 	/**
@@ -382,26 +240,6 @@ class OutOfSync
 			margin-bottom: 0;
 		}
 
-		#outofsync-error-spinner:after {
-			content: "";
-			display: inline-block;
-			width: 1em;
-			height: 1em;
-			border: 2px solid transparent;
-			border-right-color: currentColor;
-			border-bottom-color: currentColor;
-			border-radius: 50%;
-			vertical-align: baseline;
-			animation: spinner-border .75s linear infinite;
-			opacity: .5;
-		}
-
-		@keyframes spinner-border {
-			to {
-				transform: rotate(360deg);
-			}
-		}
-
 		@media (min-width: 1025px) {
 			#outofsync-error:before {
 				content: "\f534";
@@ -438,166 +276,6 @@ class OutOfSync
 		<?php
 	}
 
-	/**
-	 * Render JS for handling the notice actions
-	 *
-	 * @return void
-	 */
-	public function print_js(){
-		?>
-		<script type="text/javascript">
-
-		document.addEventListener("DOMContentLoaded", function() {
-
-			var notice = document.getElementById('outofsync-error');
-
-			if( ! notice ){
-				return;
-			}
-
-			var responseHolder = notice.querySelector('#outofsync-error-actions');
-
-			if( responseHolder && typeof jQuery !== 'undefined'){
-				jQuery.ajax({
-					method: "post",
-					url: '<?php echo admin_url( 'admin-ajax.php' ) ?>',
-					data: {
-						action     : "rey_get_actions",
-						slug       : responseHolder.getAttribute('data-slug'),
-						_ajax_nonce: responseHolder.getAttribute('data-nonce'),
-					},
-					success: function (response) {
-
-						var spinner = notice.querySelector('#outofsync-error-spinner');
-
-						if( spinner ){
-							spinner.remove();
-						}
-
-						if( response.success ){
-							responseHolder.style.display = 'block';
-						}
-					},
-				});
-			}
-
-			var updateLink = notice.querySelector('#js-update-link');
-
-			var isUpdating = false;
-
-			window.onbeforeunload = function () {
-				if (isUpdating) {
-					return "Updating is in progress! Please don't close window.";
-				}
-				return undefined;
-			};
-
-			updateLink && updateLink.addEventListener('click', function(e){
-				e.preventDefault();
-
-				var btn = e.currentTarget;
-
-				isUpdating = true;
-
-				btn.classList.add('--disabled');
-				btn.classList.add('--loading');
-
-				btn.textContent = 'Updating..';
-
-				if( typeof jQuery === 'undefined' ){
-					console.error('jQuery not defined.')
-					return;
-				}
-
-				jQuery.ajax({
-					method: "post",
-					url: '<?php echo admin_url( 'admin-ajax.php' ) ?>',
-					data: {
-						action     : "rey_outdated_link",
-						slug       : btn.getAttribute('data-slug'),
-						_ajax_nonce: btn.getAttribute('data-nonce'),
-					},
-					success: function (response) {
-
-						btn.classList.remove('--loading');
-						btn.classList.remove('--disabled');
-
-						btn.textContent = 'Reloading page..';
-
-						isUpdating = false;
-
-						setTimeout(function () {
-							location.reload();
-						}, 1000);
-					},
-				});
-
-			});
-
-
-			var downloadLink = notice.querySelector('#js-update-download-link');
-
-			downloadLink && downloadLink.addEventListener('click', function(e){
-				e.preventDefault();
-
-				var btn = e.currentTarget;
-
-				btn.classList.add('--disabled');
-				btn.classList.add('--loading');
-
-				if( typeof jQuery === 'undefined' ){
-					console.error('jQuery not defined.')
-					return;
-				}
-
-				jQuery.ajax({
-					method: "post",
-					url: '<?php echo admin_url( 'admin-ajax.php' ) ?>',
-					data: {
-						action     : "rey_download_link",
-						slug       : btn.getAttribute('data-slug'),
-						_ajax_nonce: btn.getAttribute('data-nonce'),
-					},
-					success: function (response) {
-
-						btn.classList.remove('--loading');
-
-						if( ! response ){
-							console.error(response);
-							return;
-						}
-
-						if( ! response.success ){
-							btn.textContent = response.data;
-							console.error(response.data);
-							return;
-						}
-
-						btn.classList.remove('--disabled');
-
-						var a = document.createElement('a');
-							a.href = response.data;
-							a.download = btn.getAttribute('data-slug');
-							a.dispatchEvent(new MouseEvent('click'));
-					},
-				});
-			});
-		});
-
-		</script>
-		<?php
-	}
-
-	public static function valid_url($url)
-	{
-		$response = wp_safe_remote_get( $url );
-
-		if ( is_wp_error( $response ) ) {
-			return false;
-		}
-
-		return 200 === wp_remote_retrieve_response_code( $response );
-	}
 }
 
 new OutOfSync;

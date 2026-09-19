@@ -35,7 +35,6 @@ class Plugin
 	public $woocommerce_assets;
 	public $woocommerce_tags = [];
 	public $modules;
-	public $demo_import;
 	public $plugins_manager;
 	public $js_icons;
 
@@ -71,7 +70,6 @@ class Plugin
 		$this->elementor       = new Elementor\Base();
 		$this->customizer      = new Customizer\Base();
 		$this->modules         = new Modules\Base();
-		$this->demo_import     = new \ReyCore\Libs\Importer\Base();
 		$this->plugins_manager = new \ReyCore\Libs\PluginsManager\Base();
 		$this->js_icons        = new \ReyCore\Libs\JsIcons();
 
@@ -115,7 +113,6 @@ class Plugin
 			'admin_menu'       => true,
 			'admin_bar_menu'   => true,
 			'elementor_menu'   => true,
-			'demo_import'      => true,
 			'elements_manager' => true,
 			'modules_manager'  => true,
 			'whats_new'        => true,

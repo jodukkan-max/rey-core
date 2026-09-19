@@ -2164,7 +2164,6 @@ class Fields {
 					'instructions' => esc_html_x('Select which menu items should be hidden in the side menu, under Management.', 'Backend setting description', 'rey-core'),
 					'choices' => [
 						'customizer' => esc_html_x('Customizer', 'Backend setting label', 'rey-core'),
-						'demo_import' => esc_html_x('Import Demo Sites', 'Backend setting label', 'rey-core'),
 						'modules' => esc_html_x('Modules Manager', 'Backend setting label', 'rey-core'),
 						'elements' => esc_html_x('Elements Manager', 'Backend setting label', 'rey-core'),
 						'plugins' => esc_html_x('Plugins Manager', 'Backend setting label', 'rey-core'),
