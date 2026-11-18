@@ -1256,7 +1256,7 @@ class BasicSlider extends \ReyCore\Elementor\WidgetsBase {
 			$classes['transition'] = 'splide--' . esc_attr( $this->_settings['transition'] );
 
 			$_config = [
-				'direction'      => $this->_settings['direction'],
+				'direction'      => $this->_settings['direction'] === 'ltr' && is_rtl() ? 'rtl' : $this->_settings['direction'],
 				'infinite'       => $this->_settings['infinite'] !== '',
 				'autoplay'       => $this->_settings['autoplay'] !== '',
 				'interval'       => ! empty($this->_settings['autoplay_duration']) ? absint($this->_settings['autoplay_duration']) : 5000,

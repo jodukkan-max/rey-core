@@ -50,18 +50,12 @@ class Base
 	 * - after updates
 	 */
 	public function flush_cache(){
-		if( is_multisite() ){
-			$blogs = get_sites();
-			foreach ( $blogs as $keys => $blog ) {
-				$blog_id = $blog->blog_id;
-				switch_to_blog( $blog_id );
-					\Elementor\Plugin::$instance->files_manager->clear_cache();
-				restore_current_blog();
-			}
-		}
-		else {
-			\Elementor\Plugin::$instance->files_manager->clear_cache();
-		}
+		// Dukkan patch (2026-11-03): do NOT call Elementor's
+		// files_manager->clear_cache() here. It deletes ALL compiled
+		// post-*.css files, and nginx's FastCGI cache keeps serving cached
+		// pages that still reference the deleted CSS (the "broken design"
+		// bug). Elementor regenerates its own CSS on document saves and on
+		// Elementor version bumps, so a global wipe is unnecessary.
 	}
 
 }

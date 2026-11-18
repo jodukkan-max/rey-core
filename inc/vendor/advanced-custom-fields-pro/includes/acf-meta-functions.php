@@ -60,6 +60,14 @@ function acf_get_meta( $post_id = 0 ) {
  * @return  array
  */
 function acf_get_option_meta( $prefix = '' ) {
+	// Dukkan perf fix: per-request static cache. ACF calls this once per
+	// options-page field (Rey theme registers them in code); each call was a
+	// full wp_options LIKE scan with no cache - a severe admin-page N+1.
+	static $dukkan_cache = array();
+	if ( isset( $dukkan_cache[ $prefix ] ) ) {
+		return $dukkan_cache[ $prefix ];
+	}
+
 	// Globals.
 	global $wpdb;
 
@@ -92,6 +100,7 @@ function acf_get_option_meta( $prefix = '' ) {
 	}
 
 	// Return results.
+	$dukkan_cache[ $prefix ] = $meta;
 	return $meta;
 }
 
